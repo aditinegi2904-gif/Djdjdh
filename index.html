@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoboMind AI — Learn Robotics with AI</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <!-- ─── NAVBAR ─── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">RoboMind<span class="logo-ai">AI</span></span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="pages/learn.html">Learn</a></li>
+      <li><a href="pages/projects.html">Projects</a></li>
+      <li><a href="pages/generator.html">AI Generator</a></li>
+      <li><a href="pages/chatbot.html">Chatbot</a></li>
+      <li><a href="pages/dashboard.html">Dashboard</a></li>
+    </ul>
+    <div class="nav-actions">
+      <span class="user-status" id="userStatus"></span>
+      <a href="pages/auth.html" class="btn-login" id="authBtn">Login</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-particles" id="particles"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span> AI-Powered Robotics Platform
+      </div>
+      <h1 class="hero-title">
+        Build the<br/>
+        <span class="glitch" data-text="Future">Future</span><br/>
+        with Robots
+      </h1>
+      <p class="hero-sub">
+        Generate Arduino code, learn electronics, and build intelligent machines
+        — all powered by AI. From beginner to maker in weeks.
+      </p>
+      <div class="hero-cta">
+        <a href="pages/generator.html" class="btn-primary">
+          <span>Generate Robot Code</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="pages/learn.html" class="btn-secondary">Start Learning</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">50+</span><span class="stat-label">Lessons</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">15+</span><span class="stat-label">Projects</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-num">AI</span><span class="stat-label">Powered</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="robot-orb">
+        <div class="orb-ring r1"></div>
+        <div class="orb-ring r2"></div>
+        <div class="orb-ring r3"></div>
+        <div class="orb-core">
+          <span class="orb-icon">🤖</span>
+        </div>
+        <div class="orb-data">
+          <div class="data-line" style="--d:0s">Analyzing circuit...</div>
+          <div class="data-line" style="--d:0.5s">Generating code...</div>
+          <div class="data-line" style="--d:1s">Deploying to robot...</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FEATURES ─── -->
+  <section class="features">
+    <div class="section-label">Platform Features</div>
+    <h2 class="section-title">Everything you need to <span class="highlight">build robots</span></h2>
+    <div class="features-grid">
+      <div class="feature-card" onclick="location.href='pages/learn.html'">
+        <div class="feat-icon">📡</div>
+        <h3>Learn Robotics</h3>
+        <p>Structured lessons on Arduino, sensors, motors, IoT, and embedded systems. Beginner to advanced.</p>
+        <span class="feat-link">Explore Lessons →</span>
+      </div>
+      <div class="feature-card" onclick="location.href='pages/projects.html'">
+        <div class="feat-icon">🔧</div>
+        <h3>Project Library</h3>
+        <p>15+ real robotics projects with circuit diagrams, code, and step-by-step instructions.</p>
+        <span class="feat-link">Browse Projects →</span>
+      </div>
+      <div class="feature-card featured" onclick="location.href='pages/generator.html'">
+        <div class="feat-badge">AI</div>
+        <div class="feat-icon">⚡</div>
+        <h3>AI Code Generator</h3>
+        <p>Describe your robot idea in plain English. Get complete Arduino code + wiring explanation instantly.</p>
+        <span class="feat-link">Try Generator →</span>
+      </div>
+      <div class="feature-card" onclick="location.href='pages/chatbot.html'">
+        <div class="feat-icon">💬</div>
+        <h3>AI Chatbot</h3>
+        <p>Ask any robotics question. Get expert answers powered by advanced AI, 24/7.</p>
+        <span class="feat-link">Open Chat →</span>
+      </div>
+      <div class="feature-card" onclick="location.href='pages/dashboard.html'">
+        <div class="feat-icon">📊</div>
+        <h3>Personal Dashboard</h3>
+        <p>Track your progress, save generated code, and manage your robotics project portfolio.</p>
+        <span class="feat-link">View Dashboard →</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── HOW IT WORKS ─── -->
+  <section class="how-it-works">
+    <div class="section-label">Workflow</div>
+    <h2 class="section-title">From idea to <span class="highlight">working robot</span></h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <h3>Describe Your Robot</h3>
+          <p>Type what you want to build — "obstacle avoiding robot" or "IoT temperature monitor"</p>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <h3>AI Generates Code</h3>
+          <p>Our AI produces complete, commented Arduino code with wiring diagrams</p>
+        </div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <h3>Build & Deploy</h3>
+          <p>Follow the instructions, upload to your Arduino, and watch your robot come alive</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ─── -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">RoboMind<span class="logo-ai">AI</span></span>
+      </div>
+      <p class="footer-tagline">Building the next generation of robot makers.</p>
+      <div class="footer-links">
+        <a href="pages/learn.html">Learn</a>
+        <a href="pages/projects.html">Projects</a>
+        <a href="pages/generator.html">AI Generator</a>
+        <a href="pages/chatbot.html">Chatbot</a>
+      </div>
+      <p class="footer-copy">© 2025 RoboMind AI. Powered by Firebase &amp; OpenAI.</p>
+    </div>
+  </footer>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { FIREBASE_CONFIG } from '../js/config.js';
+
+    const app = initializeApp(FIREBASE_CONFIG);
+    const auth = getAuth(app);
+
+    // Update navbar based on auth state
+    onAuthStateChanged(auth, (user) => {
+      const authBtn = document.getElementById('authBtn');
+      const userStatus = document.getElementById('userStatus');
+      if (user) {
+        userStatus.textContent = user.email.split('@')[0];
+        authBtn.textContent = 'Dashboard';
+        authBtn.href = 'pages/dashboard.html';
+      }
+    });
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>
