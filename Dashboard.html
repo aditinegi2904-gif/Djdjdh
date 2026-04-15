@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoboMind AI — Dashboard</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    .dash-wrap { max-width: 1100px; margin: 0 auto; padding: calc(var(--nav-h) + 3rem) 2rem 5rem; }
+    .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem; }
+    .dash-greeting h1 { font-size: clamp(1.4rem, 3vw, 2rem); }
+    .dash-greeting p  { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; }
+    .logout-btn {
+      font-family: var(--font-code); font-size: 0.75rem;
+      padding: 0.5rem 1rem;
+      background: transparent; color: var(--pink);
+      border: 1px solid rgba(255,0,128,0.3); border-radius: var(--radius);
+      cursor: pointer; transition: all var(--transition);
+    }
+    .logout-btn:hover { background: rgba(255,0,128,0.1); }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 3rem; }
+    .stat-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem;
+    }
+    .stat-card-num { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--cyan); }
+    .stat-card-label { font-family: var(--font-code); font-size: 0.72rem; color: var(--text-secondary); letter-spacing: 1px; margin-top: 0.25rem; }
+
+    /* Section */
+    .dash-section { margin-bottom: 2.5rem; }
+    .dash-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .dash-section-header h2 { font-size: 0.85rem; color: var(--cyan); font-family: var(--font-code); letter-spacing: 2px; }
+    .dash-section-header a { font-family: var(--font-code); font-size: 0.72rem; color: var(--text-secondary); }
+    .dash-section-header a:hover { color: var(--cyan); }
+
+    /* Code cards */
+    .codes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+    .code-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.25rem; transition: all var(--transition);
+    }
+    .code-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
+    .code-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .code-card-title { font-size: 0.9rem; color: var(--text-primary); font-weight: 600; flex: 1; }
+    .code-card-board { font-family: var(--font-code); font-size: 0.65rem; color: var(--cyan); background: rgba(0,245,255,0.08); padding: 0.15rem 0.5rem; border-radius: 4px; white-space: nowrap; }
+    .code-card-date { font-family: var(--font-code); font-size: 0.68rem; color: var(--text-dim); margin-bottom: 0.75rem; }
+    .code-preview {
+      background: #020408; border: 1px solid rgba(0,245,255,0.1); border-radius: 6px;
+      padding: 0.6rem 0.75rem;
+      font-family: var(--font-code); font-size: 0.72rem;
+      color: #6a8a9a; overflow: hidden;
+      max-height: 60px; line-height: 1.5;
+      position: relative;
+    }
+    .code-preview::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 20px; background: linear-gradient(transparent, #020408);
+    }
+    .code-actions { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
+    .code-action-btn {
+      font-family: var(--font-code); font-size: 0.7rem;
+      padding: 0.3rem 0.65rem; background: transparent;
+      border: 1px solid var(--border); border-radius: 4px;
+      color: var(--text-secondary); cursor: pointer; transition: all var(--transition);
+    }
+    .code-action-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+    .code-action-btn.del:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* Quick links */
+    .quick-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+    .quick-link-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.25rem; text-align: center; cursor: pointer;
+      transition: all var(--transition); text-decoration: none; display: block;
+    }
+    .quick-link-card:hover { border-color: var(--border-bright); transform: translateY(-3px); }
+    .quick-link-card .ql-icon { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
+    .quick-link-card .ql-label { font-family: var(--font-display); font-size: 0.75rem; color: var(--text-primary); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 3rem;
+      background: var(--bg-card); border: 1px dashed var(--border); border-radius: 12px;
+    }
+    .empty-state .es-icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+    .empty-state p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem; }
+
+    /* Auth gate */
+    .auth-gate { text-align: center; padding: 6rem 2rem; }
+    .auth-gate h2 { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    .auth-gate p { color: var(--text-secondary); margin-bottom: 2rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="../index.html" class="nav-logo" style="text-decoration:none">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">RoboMind<span class="logo-ai">AI</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="generator.html">AI Generator</a></li>
+      <li><a href="chatbot.html">Chatbot</a></li>
+      <li><a href="dashboard.html" class="active">Dashboard</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="hamburger" id="hamburger">☰</button>
+    </div>
+  </nav>
+
+  <!-- Auth gate (shown when not logged in) -->
+  <div id="authGate" class="dash-wrap auth-gate" style="display:none">
+    <div style="font-size:4rem">🔒</div>
+    <h2>Login to Access Dashboard</h2>
+    <p>Create a free account to save generated code, track progress, and manage projects.</p>
+    <a href="auth.html" class="btn-primary" style="display:inline-flex">Create Free Account →</a>
+  </div>
+
+  <!-- Dashboard content (shown when logged in) -->
+  <div id="dashContent" class="dash-wrap" style="display:none">
+    <div class="dash-header">
+      <div class="dash-greeting">
+        <h1>Welcome back, <span style="color:var(--cyan)" id="userName">Maker</span> 👋</h1>
+        <p id="dashSubtitle">Here's your robotics progress overview</p>
+      </div>
+      <button class="logout-btn" onclick="handleLogout()">⏏ Logout</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-card-num" id="statCodes">0</div>
+        <div class="stat-card-label">SAVED CODES</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" id="statChats">0</div>
+        <div class="stat-card-label">AI CONVERSATIONS</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" style="color:var(--green)">50+</div>
+        <div class="stat-card-label">LESSONS AVAILABLE</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-num" style="color:var(--orange)">15+</div>
+        <div class="stat-card-label">PROJECTS AVAILABLE</div>
+      </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="dash-section">
+      <div class="dash-section-header"><h2>// QUICK ACCESS</h2></div>
+      <div class="quick-links">
+        <a href="generator.html" class="quick-link-card">
+          <span class="ql-icon">⚡</span>
+          <span class="ql-label">AI Generator</span>
+        </a>
+        <a href="chatbot.html" class="quick-link-card">
+          <span class="ql-icon">💬</span>
+          <span class="ql-label">AI Chatbot</span>
+        </a>
+        <a href="learn.html" class="quick-link-card">
+          <span class="ql-icon">📡</span>
+          <span class="ql-label">Learn Robotics</span>
+        </a>
+        <a href="projects.html" class="quick-link-card">
+          <span class="ql-icon">🔧</span>
+          <span class="ql-label">Project Library</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Saved Codes -->
+    <div class="dash-section">
+      <div class="dash-section-header">
+        <h2>// SAVED CODES</h2>
+        <a href="generator.html">+ Generate New</a>
+      </div>
+      <div id="savedCodesSection">
+        <div class="empty-state">
+          <span class="es-icon">💾</span>
+          <p>No saved codes yet. Generate some Arduino code and save it here!</p>
+          <a href="generator.html" class="btn-primary" style="display:inline-flex;font-size:0.8rem">Generate Code →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Info -->
+    <div class="dash-section">
+      <div class="dash-section-header"><h2>// ACCOUNT INFO</h2></div>
+      <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.5rem">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.5rem">
+          <div>
+            <div style="font-family:var(--font-code);font-size:0.7rem;color:var(--text-dim);letter-spacing:1px;margin-bottom:0.3rem">EMAIL</div>
+            <div id="accountEmail" style="color:var(--text-primary);font-size:0.9rem"></div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-code);font-size:0.7rem;color:var(--text-dim);letter-spacing:1px;margin-bottom:0.3rem">MEMBER SINCE</div>
+            <div id="accountSince" style="color:var(--text-primary);font-size:0.9rem"></div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-code);font-size:0.7rem;color:var(--text-dim);letter-spacing:1px;margin-bottom:0.3rem">STATUS</div>
+            <div style="color:var(--green);font-family:var(--font-code);font-size:0.8rem">● ACTIVE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut }
+           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, query, where, orderBy, getDocs, deleteDoc, doc, getDoc, limit }
+           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { FIREBASE_CONFIG, showToast, copyToClipboard, formatDate } from '../js/config.js';
+
+    const app  = initializeApp(FIREBASE_CONFIG);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        document.getElementById('authGate').style.display = 'block';
+        document.getElementById('dashContent').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('authGate').style.display = 'none';
+      document.getElementById('dashContent').style.display = 'block';
+
+      // Populate user info
+      const name = user.displayName || user.email.split('@')[0];
+      document.getElementById('userName').textContent = name;
+      document.getElementById('accountEmail').textContent = user.email;
+      document.getElementById('accountSince').textContent = new Date(user.metadata.creationTime).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+
+      // Load saved codes
+      await loadSavedCodes(user.uid);
+      // Load chat count
+      await loadChatCount(user.uid);
+    });
+
+    async function loadSavedCodes(uid) {
+      try {
+        const q = query(
+          collection(db, 'savedCodes'),
+          where('uid', '==', uid),
+          orderBy('createdAt', 'desc'),
+          limit(12)
+        );
+        const snap = await getDocs(q);
+        const codes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+        document.getElementById('statCodes').textContent = codes.length;
+
+        if (codes.length === 0) return;
+
+        document.getElementById('savedCodesSection').innerHTML = `
+          <div class="codes-grid">
+            ${codes.map(c => `
+              <div class="code-card">
+                <div class="code-card-top">
+                  <span class="code-card-title">${c.title || 'Untitled Code'}</span>
+                  <span class="code-card-board">${c.board || 'Arduino'}</span>
+                </div>
+                <div class="code-card-date">📅 ${formatDate(c.createdAt)}</div>
+                <div class="code-preview">${escapeHtml(c.code || '')}</div>
+                <div class="code-actions">
+                  <button class="code-action-btn" onclick="copyCode('${c.id}', \`${escapeForAttr(c.code)}\`)">📋 Copy</button>
+                  <button class="code-action-btn" onclick="viewCode('${c.id}')">👁 View</button>
+                  <button class="code-action-btn del" onclick="deleteCode('${c.id}')">🗑 Delete</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>`;
+
+        // Store codes globally for access
+        window._savedCodes = codes;
+
+      } catch (err) {
+        console.error('Error loading codes:', err);
+      }
+    }
+
+    async function loadChatCount(uid) {
+      try {
+        const q = query(collection(db, 'chatHistory'), where('uid', '==', uid), limit(100));
+        const snap = await getDocs(q);
+        document.getElementById('statChats').textContent = snap.size;
+      } catch (e) { /* silent */ }
+    }
+
+    window.copyCode = (id, code) => copyToClipboard(code);
+
+    window.viewCode = (id) => {
+      const codes = window._savedCodes || [];
+      const c = codes.find(x => x.id === id);
+      if (!c) return;
+      sessionStorage.setItem('viewCode', JSON.stringify(c));
+      window.location.href = 'generator.html';
+    };
+
+    window.deleteCode = async (id) => {
+      if (!confirm('Delete this saved code?')) return;
+      try {
+        await deleteDoc(doc(db, 'savedCodes', id));
+        showToast('Code deleted.', 'success');
+        const user = auth.currentUser;
+        if (user) loadSavedCodes(user.uid);
+      } catch (err) {
+        showToast('Delete failed: ' + err.message, 'error');
+      }
+    };
+
+    window.handleLogout = async () => {
+      await signOut(auth);
+      showToast('Logged out successfully.', 'success');
+      setTimeout(() => window.location.href = '../index.html', 1000);
+    };
+
+    function escapeHtml(s) {
+      return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function escapeForAttr(s) {
+      return (s||'').replace(/`/g,'\\`').replace(/\$/g,'\\$').slice(0, 500);
+    }
+
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 30);
+    });
+  </script>
+</body>
+</html>
