@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoboMind AI — AI Code Generator</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    .gen-hero {
+      text-align: center;
+      padding: calc(var(--nav-h) + 3rem) 2rem 2rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0,245,255,0.06), transparent 60%);
+    }
+    .gen-hero h1 { font-size: clamp(1.8rem, 4vw, 3rem); margin-bottom: 0.75rem; }
+    .gen-hero p  { color: var(--text-secondary); max-width: 550px; margin: auto; }
+
+    .gen-wrap {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 2rem 4rem;
+    }
+
+    /* Input area */
+    .gen-input-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .gen-input-card h3 {
+      font-size: 0.85rem;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+      font-family: var(--font-code);
+    }
+    .idea-input {
+      width: 100%;
+      min-height: 120px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      padding: 1rem;
+      resize: vertical;
+      outline: none;
+      transition: border-color var(--transition);
+      line-height: 1.6;
+    }
+    .idea-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0,245,255,0.08); }
+    .idea-input::placeholder { color: var(--text-dim); }
+
+    .gen-options {
+      display: flex;
+      gap: 1rem;
+      margin: 1.25rem 0;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .gen-options select {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .gen-options label {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .gen-btn {
+      width: 100%;
+      padding: 1rem;
+      background: var(--cyan);
+      color: var(--bg-base);
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+    .gen-btn:hover:not(:disabled) { background: #fff; box-shadow: var(--glow-cyan); }
+    .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .gen-btn svg { width: 20px; height: 20px; }
+
+    /* Quick prompts */
+    .quick-prompts { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+    .quick-chip {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      padding: 0.3rem 0.75rem;
+      background: rgba(0,245,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .quick-chip:hover { border-color: var(--cyan); color: var(--cyan); background: rgba(0,245,255,0.1); }
+
+    /* Output */
+    .output-section { display: none; }
+    .output-section.visible { display: block; }
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .output-header h2 { font-size: 1.1rem; color: var(--text-primary); }
+    .output-actions { display: flex; gap: 0.75rem; }
+    .action-btn {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      padding: 0.45rem 0.9rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .action-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+    .action-btn.save { border-color: rgba(57,255,20,0.4); color: var(--green); }
+    .action-btn.save:hover { background: rgba(57,255,20,0.08); }
+
+    /* Code block */
+    .code-block {
+      background: #020408;
+      border: 1px solid rgba(0,245,255,0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.25rem;
+      background: rgba(0,245,255,0.04);
+      border-bottom: 1px solid rgba(0,245,255,0.1);
+    }
+    .code-lang {
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: var(--cyan);
+      letter-spacing: 2px;
+    }
+    .copy-btn {
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      padding: 0.3rem 0.7rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+    .copy-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+    .code-content {
+      padding: 1.5rem;
+      overflow-x: auto;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      line-height: 1.7;
+      color: #a8d8ea;
+      white-space: pre;
+    }
+    /* Syntax highlighting (basic) */
+    .code-content .kw  { color: #c792ea; }
+    .code-content .cm  { color: #546e7a; font-style: italic; }
+    .code-content .str { color: #c3e88d; }
+    .code-content .num { color: #f78c6c; }
+
+    /* Explanation */
+    .explanation-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .explanation-card h3 {
+      font-size: 0.8rem;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+      font-family: var(--font-code);
+    }
+    .explanation-card p, .explanation-card li {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    .explanation-card ul { padding-left: 1.2rem; }
+    .explanation-card li { margin-bottom: 0.4rem; }
+
+    /* Loading state */
+    .loading-state {
+      text-align: center;
+      padding: 4rem 2rem;
+    }
+    .loading-bar {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 1.5rem auto;
+      max-width: 300px;
+    }
+    .loading-fill {
+      height: 100%;
+      background: var(--cyan);
+      border-radius: 2px;
+      animation: loadbar 2s ease infinite;
+      box-shadow: 0 0 10px var(--cyan);
+    }
+    @keyframes loadbar { 0%{width:0;margin-left:0} 50%{width:70%;margin-left:15%} 100%{width:0;margin-left:100%} }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <a href="../index.html" class="nav-logo" style="text-decoration:none">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">RoboMind<span class="logo-ai">AI</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="generator.html" class="active">AI Generator</a></li>
+      <li><a href="chatbot.html">Chatbot</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+    </ul>
+    <div class="nav-actions">
+      <span class="user-status" id="userStatus"></span>
+      <a href="auth.html" class="btn-login" id="authBtn">Login</a>
+      <button class="hamburger" id="hamburger">☰</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="gen-hero">
+    <div class="section-label">AI-Powered</div>
+    <h1>Arduino Code <span style="color:var(--cyan)">Generator</span></h1>
+    <p>Describe your robot idea and get complete, commented Arduino code with wiring instructions — instantly.</p>
+  </div>
+
+  <div class="gen-wrap">
+    <!-- Input Card -->
+    <div class="gen-input-card">
+      <h3>// DESCRIBE YOUR ROBOT</h3>
+      <textarea class="idea-input" id="robotIdea"
+        placeholder="e.g. Build an obstacle-avoiding robot with an ultrasonic sensor and two DC motors. Add an LED that blinks red when an obstacle is detected."></textarea>
+
+      <div class="gen-options">
+        <label>Board:
+          <select id="boardType">
+            <option value="Arduino Uno">Arduino Uno</option>
+            <option value="Arduino Nano">Arduino Nano</option>
+            <option value="Arduino Mega">Arduino Mega</option>
+            <option value="ESP32">ESP32</option>
+            <option value="ESP8266">ESP8266</option>
+          </select>
+        </label>
+        <label>Level:
+          <select id="codeLevel">
+            <option value="beginner">Beginner (heavily commented)</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced (concise)</option>
+          </select>
+        </label>
+      </div>
+
+      <!-- Quick prompts -->
+      <div class="quick-prompts">
+        <span style="font-family:var(--font-code);font-size:0.72rem;color:var(--text-dim)">Quick:</span>
+        <button class="quick-chip" onclick="setPrompt('Obstacle avoiding robot with HC-SR04 ultrasonic sensor, L298N motor driver and 2 DC motors')">Obstacle Avoider</button>
+        <button class="quick-chip" onclick="setPrompt('Line following robot with 3 IR sensors and L298N motor driver')">Line Follower</button>
+        <button class="quick-chip" onclick="setPrompt('Bluetooth controlled robot car using HC-05 module and L298N motor driver controlled via Android app')">Bluetooth Robot</button>
+        <button class="quick-chip" onclick="setPrompt('IoT temperature and humidity monitor with DHT22 sensor, OLED display, and WiFi data upload to ThingSpeak')">IoT Monitor</button>
+        <button class="quick-chip" onclick="setPrompt('Robotic arm with 4 servo motors controlled by potentiometers')">Robotic Arm</button>
+      </div>
+
+      <br/>
+      <button class="gen-btn" id="generateBtn" onclick="generateCode()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+        GENERATE ARDUINO CODE
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" style="display:none" class="loading-state">
+      <div class="spinner"></div>
+      <div class="loading-bar"><div class="loading-fill"></div></div>
+      <div class="loading-text" id="loadingMsg">Analyzing your robot design...</div>
+    </div>
+
+    <!-- Output -->
+    <div class="output-section" id="outputSection">
+      <div class="output-header">
+        <h2>Generated Code</h2>
+        <div class="output-actions">
+          <button class="action-btn" onclick="copyCode()">📋 Copy Code</button>
+          <button class="action-btn save" id="saveBtn" onclick="saveCode()">💾 Save to Profile</button>
+        </div>
+      </div>
+
+      <!-- Code Block -->
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">ARDUINO / C++</span>
+          <button class="copy-btn" onclick="copyCode()">Copy</button>
+        </div>
+        <div class="code-content" id="codeOutput"></div>
+      </div>
+
+      <!-- Explanation -->
+      <div class="explanation-card">
+        <h3>// EXPLANATION & WIRING</h3>
+        <div id="explanationOutput"></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, serverTimestamp }
+           from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { FIREBASE_CONFIG, callOpenAI, showToast, copyToClipboard } from '../js/config.js';
+
+    const app  = initializeApp(FIREBASE_CONFIG);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    let currentUser   = null;
+    let generatedCode = '';
+
+    onAuthStateChanged(auth, (user) => {
+      currentUser = user;
+      const authBtn    = document.getElementById('authBtn');
+      const userStatus = document.getElementById('userStatus');
+      if (user) {
+        userStatus.textContent = user.displayName || user.email.split('@')[0];
+        authBtn.textContent = 'Dashboard';
+        authBtn.href = 'dashboard.html';
+      }
+    });
+
+    // ── Set prompt from quick chips ────────────────────────────
+    window.setPrompt = (text) => {
+      document.getElementById('robotIdea').value = text;
+      document.getElementById('robotIdea').focus();
+    };
+
+    // ── Generate Code ──────────────────────────────────────────
+    window.generateCode = async () => {
+      const idea  = document.getElementById('robotIdea').value.trim();
+      const board = document.getElementById('boardType').value;
+      const level = document.getElementById('codeLevel').value;
+
+      if (!idea) {
+        showToast('Please describe your robot first!', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('generateBtn');
+      btn.disabled = true;
+      document.getElementById('loadingState').style.display = 'block';
+      document.getElementById('outputSection').classList.remove('visible');
+
+      // Cycle loading messages
+      const msgs = ['Analyzing your robot design...', 'Planning the circuit...', 'Writing Arduino code...', 'Adding comments...', 'Almost ready!'];
+      let mi = 0;
+      const msgInterval = setInterval(() => {
+        document.getElementById('loadingMsg').textContent = msgs[mi++ % msgs.length];
+      }, 1200);
+
+      const systemPrompt = `You are an expert robotics and Arduino engineer. Generate complete, working Arduino code.
+Always respond in this EXACT format (no markdown fences):
+===CODE===
+(complete Arduino .ino code here)
+===EXPLANATION===
+(explanation with sections: Overview, Components Needed, Wiring Instructions, How It Works, Tips)
+
+Board: ${board} | Code Level: ${level} (${level === 'beginner' ? 'add detailed comments on every important line' : level === 'intermediate' ? 'comment key sections' : 'minimal comments'})`;
+
+      try {
+        const response = await callOpenAI([
+          { role: 'system', content: systemPrompt },
+          { role: 'user',   content: `Build this robot: ${idea}` }
+        ], 'gpt-3.5-turbo');
+
+        clearInterval(msgInterval);
+
+        // Parse CODE and EXPLANATION sections
+        const codePart  = response.split('===EXPLANATION===')[0].replace('===CODE===', '').trim();
+        const expPart   = response.split('===EXPLANATION===')[1]?.trim() || response;
+
+        generatedCode = codePart;
+
+        // Display code with basic syntax highlight
+        document.getElementById('codeOutput').innerHTML = highlightCode(codePart);
+
+        // Display explanation as formatted HTML
+        document.getElementById('explanationOutput').innerHTML = formatExplanation(expPart);
+
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('outputSection').classList.add('visible');
+        document.getElementById('outputSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        clearInterval(msgInterval);
+        document.getElementById('loadingState').style.display = 'none';
+        showToast('Error: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    // ── Copy code ──────────────────────────────────────────────
+    window.copyCode = () => copyToClipboard(generatedCode);
+
+    // ── Save code to Firestore ─────────────────────────────────
+    window.saveCode = async () => {
+      if (!currentUser) {
+        showToast('Please log in to save code.', 'error');
+        setTimeout(() => window.location.href = 'auth.html', 1500);
+        return;
+      }
+      const idea  = document.getElementById('robotIdea').value.trim();
+      const board = document.getElementById('boardType').value;
+      try {
+        await addDoc(collection(db, 'savedCodes'), {
+          uid:         currentUser.uid,
+          title:       idea.slice(0, 60) + (idea.length > 60 ? '...' : ''),
+          board,
+          code:        generatedCode,
+          explanation: document.getElementById('explanationOutput').innerText,
+          createdAt:   serverTimestamp()
+        });
+        showToast('Code saved to your profile! ✓', 'success');
+      } catch (err) {
+        showToast('Save failed: ' + err.message, 'error');
+      }
+    };
+
+    // ── Syntax highlighter (basic) ─────────────────────────────
+    function highlightCode(code) {
+      return code
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        // Comments
+        .replace(/(\/\/[^\n]*)/g, '<span class="cm">$1</span>')
+        .replace(/(\/\*[\s\S]*?\*\/)/g, '<span class="cm">$1</span>')
+        // Strings
+        .replace(/("(?:[^"\\]|\\.)*")/g, '<span class="str">$1</span>')
+        // Keywords
+        .replace(/\b(void|int|float|char|bool|long|unsigned|const|return|if|else|for|while|do|switch|case|break|continue|include|define|setup|loop|true|false|HIGH|LOW|INPUT|OUTPUT|INPUT_PULLUP|digitalRead|digitalWrite|analogRead|analogWrite|pinMode|delay|Serial|millis|Serial\.begin|Serial\.print|Serial\.println)\b/g, '<span class="kw">$1</span>')
+        // Numbers
+        .replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+    }
+
+    function formatExplanation(text) {
+      // Convert plain text sections into structured HTML
+      return '<p>' + text
+        .replace(/\n\n+/g, '</p><p>')
+        .replace(/\n/g, '<br/>')
+        + '</p>';
+    }
+
+    // Hamburger
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('navLinks').classList.toggle('open');
+    });
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 30);
+    });
+  </script>
+</body>
+</html>
