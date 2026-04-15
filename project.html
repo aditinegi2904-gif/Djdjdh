@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RoboMind AI — Project Library</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    .page-hero {
+      text-align: center;
+      padding: calc(var(--nav-h) + 3rem) 2rem 2rem;
+      background: radial-gradient(ellipse at 50% 0%, rgba(57,255,20,0.05), transparent 60%);
+    }
+    .page-hero h1 { font-size: clamp(1.8rem, 4vw, 3rem); margin-bottom: 0.75rem; }
+    .page-hero p  { color: var(--text-secondary); max-width: 550px; margin: 0.5rem auto 0; }
+
+    .projects-wrap { max-width: 1200px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: all var(--transition);
+    }
+    .project-card:hover {
+      border-color: var(--border-bright);
+      transform: translateY(-5px);
+      box-shadow: 0 20px 50px rgba(0,245,255,0.1);
+    }
+
+    .project-banner {
+      height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4.5rem;
+      position: relative;
+    }
+    .project-difficulty {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      font-family: var(--font-code);
+      font-size: 0.68rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      letter-spacing: 1px;
+    }
+    .diff-easy       { background: rgba(57,255,20,0.15);  color: var(--green);  border: 1px solid rgba(57,255,20,0.3); }
+    .diff-medium     { background: rgba(255,107,0,0.15); color: var(--orange); border: 1px solid rgba(255,107,0,0.3); }
+    .diff-hard       { background: rgba(255,0,128,0.15); color: var(--pink);   border: 1px solid rgba(255,0,128,0.3); }
+
+    .project-body { padding: 1.5rem; }
+    .project-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .project-tag {
+      font-family: var(--font-code);
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-dim);
+    }
+    .project-card h3 { font-size: 1.1rem; color: var(--text-primary); margin-bottom: 0.4rem; }
+    .project-card p  { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 1rem; }
+
+    .project-meta {
+      display: flex;
+      gap: 1rem;
+      font-family: var(--font-code);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-bottom: 1.25rem;
+    }
+
+    .project-actions { display: flex; gap: 0.75rem; }
+    .proj-btn {
+      flex: 1;
+      padding: 0.65rem;
+      border-radius: var(--radius);
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all var(--transition);
+      text-align: center;
+      text-decoration: none;
+      border: none;
+    }
+    .proj-btn-primary {
+      background: var(--cyan);
+      color: var(--bg-base);
+    }
+    .proj-btn-primary:hover { background: #fff; box-shadow: var(--glow-cyan); color: var(--bg-base); }
+    .proj-btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .proj-btn-secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    /* Detail modal (reuse same style as learn page) */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(5,8,16,0.92);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border-bright);
+      border-radius: 16px;
+      width: 100%; max-width: 720px;
+      max-height: 88vh; overflow-y: auto;
+      transform: scale(0.95);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: var(--bg-card); z-index: 1;
+    }
+    .modal-header h2 { font-size: 1.1rem; }
+    .modal-close {
+      width: 32px; height: 32px;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 50%; color: var(--text-secondary);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition); font-size: 1rem;
+    }
+    .modal-close:hover { border-color: var(--pink); color: var(--pink); }
+    .modal-body { padding: 1.5rem; }
+    .modal-body h3 { color: var(--cyan); font-family: var(--font-code); font-size: 0.85rem; letter-spacing: 2px; margin: 1.25rem 0 0.6rem; }
+    .modal-body h3:first-child { margin-top: 0; }
+    .modal-body p  { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.7; margin-bottom: 0.75rem; }
+    .modal-body ul { padding-left: 1.2rem; margin-bottom: 0.75rem; }
+    .modal-body li { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.65; margin-bottom: 0.3rem; }
+    .modal-body pre {
+      background: #020408; border: 1px solid rgba(0,245,255,0.15);
+      border-radius: 8px; padding: 1.25rem; overflow-x: auto;
+      font-family: var(--font-code); font-size: 0.78rem;
+      color: #a8d8ea; line-height: 1.6; margin: 0.75rem 0;
+    }
+    .modal-footer {
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; gap: 0.75rem; justify-content: flex-end;
+    }
+    .component-list {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.5rem; margin: 0.75rem 0;
+    }
+    .component-item {
+      background: rgba(0,245,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 0.5rem 0.75rem;
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" id="navbar">
+    <a href="../index.html" class="nav-logo" style="text-decoration:none">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">RoboMind<span class="logo-ai">AI</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="learn.html">Learn</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+      <li><a href="generator.html">AI Generator</a></li>
+      <li><a href="chatbot.html">Chatbot</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+    </ul>
+    <div class="nav-actions">
+      <span class="user-status" id="userStatus"></span>
+      <a href="auth.html" class="btn-login" id="authBtn">Login</a>
+      <button class="hamburger" id="hamburger">☰</button>
+    </div>
+  </nav>
+
+  <div class="page-hero">
+    <div class="section-label">Project Library</div>
+    <h1>Build Real <span style="color:var(--green)">Robots</span></h1>
+    <p>Step-by-step guides for 15+ robotics projects. From beginner kits to advanced systems.</p>
+  </div>
+
+  <div class="projects-wrap">
+    <div class="projects-grid" id="projectsGrid"></div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modalTitle">Project</h2>
+        <button class="modal-close" onclick="closeModalDirect()">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" style="font-size:0.8rem;padding:0.6rem 1.2rem" onclick="generateForProject()">⚡ Generate Custom Code</button>
+        <button class="btn-primary" style="font-size:0.8rem;padding:0.6rem 1.2rem" onclick="closeModalDirect()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { FIREBASE_CONFIG } from '../js/config.js';
+
+    initializeApp(FIREBASE_CONFIG);
+    onAuthStateChanged(getAuth(), (user) => {
+      if (user) {
+        document.getElementById('userStatus').textContent = user.displayName || user.email.split('@')[0];
+        document.getElementById('authBtn').textContent = 'Dashboard';
+        document.getElementById('authBtn').href = 'dashboard.html';
+      }
+    });
+
+    const PROJECTS = [
+      {
+        id: 'obstacle-avoider',
+        icon: '🤖', bg: 'linear-gradient(135deg,rgba(0,245,255,0.1),rgba(0,100,200,0.06))',
+        title: 'Obstacle Avoiding Robot', difficulty: 'easy',
+        tags: ['Arduino Uno','HC-SR04','L298N','DC Motors'],
+        desc: 'Autonomous robot that detects and avoids obstacles using an ultrasonic sensor.',
+        time: '3–4 hours', cost: '$15–25',
+        components: ['Arduino Uno','HC-SR04 Ultrasonic','L298N Motor Driver','2× DC Motors','Robot Chassis','9V Battery'],
+        content: `
+<h3>Project Overview</h3>
+<p>Build a robot car that automatically avoids obstacles by measuring distance with an HC-SR04 ultrasonic sensor and steering away using DC motors controlled by an L298N driver.</p>
+<h3>Components</h3>
+<ul><li>Arduino Uno</li><li>HC-SR04 Ultrasonic Sensor</li><li>L298N Motor Driver Module</li><li>2× DC Gear Motors + Robot Chassis</li><li>9V Battery + Holder</li><li>Jumper Wires</li></ul>
+<h3>Wiring Summary</h3>
+<ul>
+<li>HC-SR04: VCC→5V, GND→GND, TRIG→pin9, ECHO→pin10</li>
+<li>L298N: IN1→pin2, IN2→pin3, IN3→pin4, IN4→pin5, ENA→pin6, ENB→pin7</li>
+<li>L298N: 12V→battery+, GND→battery-, 5V→Arduino Vin</li>
+</ul>
+<h3>Core Arduino Code</h3>
+<pre>#define TRIG 9
+#define ECHO 10
+#define IN1 2
+#define IN2 3
+#define IN3 4
+#define IN4 5
+#define ENA 6
+#define ENB 7
+#define THRESHOLD 20  // cm
+
+void setup() {
+  pinMode(TRIG,OUTPUT); pinMode(ECHO,INPUT);
+  pinMode(IN1,OUTPUT); pinMode(IN2,OUTPUT);
+  pinMode(IN3,OUTPUT); pinMode(IN4,OUTPUT);
+  pinMode(ENA,OUTPUT); pinMode(ENB,OUTPUT);
+}
+
+float getDistance() {
+  digitalWrite(TRIG,LOW); delayMicroseconds(2);
+  digitalWrite(TRIG,HIGH); delayMicroseconds(10);
+  digitalWrite(TRIG,LOW);
+  return pulseIn(ECHO,HIGH)*0.034/2;
+}
+
+void forward()  { analogWrite(ENA,180); analogWrite(ENB,180); digitalWrite(IN1,HIGH); digitalWrite(IN2,LOW); digitalWrite(IN3,HIGH); digitalWrite(IN4,LOW); }
+void backward() { analogWrite(ENA,150); analogWrite(ENB,150); digitalWrite(IN1,LOW); digitalWrite(IN2,HIGH); digitalWrite(IN3,LOW); digitalWrite(IN4,HIGH); }
+void turnRight(){ analogWrite(ENA,180); analogWrite(ENB,180); digitalWrite(IN1,HIGH); digitalWrite(IN2,LOW); digitalWrite(IN3,LOW); digitalWrite(IN4,HIGH); }
+void stopAll()  { digitalWrite(IN1,LOW); digitalWrite(IN2,LOW); digitalWrite(IN3,LOW); digitalWrite(IN4,LOW); }
+
+void loop() {
+  float dist = getDistance();
+  if (dist < THRESHOLD) {
+    stopAll(); delay(300);
+    backward(); delay(400);
+    turnRight(); delay(500);
+  } else {
+    forward();
+  }
+  delay(50);
+}</pre>
+<h3>Tips for Success</h3>
+<ul>
+<li>Mount ultrasonic sensor at the front, facing forward at ~15–20cm height</li>
+<li>Adjust THRESHOLD (20cm) based on your robot's speed</li>
+<li>Add a servo + sensor for look-left/right before deciding which way to turn</li>
+</ul>`
+      },
+      {
+        id: 'line-follower',
+        icon: '⚫', bg: 'linear-gradient(135deg,rgba(57,255,20,0.08),rgba(0,200,100,0.05))',
+        title: 'Line Following Robot', difficulty: 'easy',
+        tags: ['Arduino Uno','IR Sensors','L298N','DC Motors'],
+        desc: 'Robot that follows a black line on white surface using 3 IR sensors.',
+        time: '3–4 hours', cost: '$12–20',
+        components: ['Arduino Uno','3× IR Sensors','L298N Motor Driver','2× DC Motors','Black Tape','Robot Chassis'],
+        content: `
+<h3>Project Overview</h3>
+<p>Build a robot that follows a black line on a white surface using 3 infrared sensors. The robot continuously reads sensor values and adjusts motor speeds to stay on the line.</p>
+<h3>Sensor Layout</h3>
+<p>Mount 3 IR sensors at the front of the robot, spaced 1.5–2cm apart: Left (L), Center (C), Right (R). Position them 3–5mm above the surface.</p>
+<h3>Line Following Logic</h3>
+<pre>// Pins: IR Left=2, Center=3, Right=4
+// Motor: IN1=5,IN2=6,IN3=7,IN4=8, ENA=9,ENB=10
+
+void loop() {
+  bool L = !digitalRead(2); // true = on line
+  bool C = !digitalRead(3);
+  bool R = !digitalRead(4);
+
+  if (C && !L && !R) {
+    // Straight
+    setMotors(200, 200);
+  } else if (L && C) {
+    // Veer left — slow right motor
+    setMotors(120, 200);
+  } else if (R && C) {
+    // Veer right — slow left motor
+    setMotors(200, 120);
+  } else if (L && !C && !R) {
+    // Sharp left turn
+    setMotors(0, 200);
+  } else if (R && !C && !L) {
+    // Sharp right turn
+    setMotors(200, 0);
+  } else {
+    // Lost line — stop
+    setMotors(0, 0);
+  }
+}</pre>
+<h3>Building the Track</h3>
+<ul>
+<li>Use 2cm wide black electrical tape on white cardboard</li>
+<li>Make smooth curves (radius ≥ 15cm for best results)</li>
+<li>Avoid sharp 90° corners initially</li>
+<li>For competition: upgrade to PID control for faster, smoother following</li>
+</ul>`
+      },
+      {
+        id: 'bluetooth-robot',
+        icon: '📱', bg: 'linear-gradient(135deg,rgba(0,100,255,0.1),rgba(100,0,255,0.05))',
+        title: 'Bluetooth RC Robot', difficulty: 'easy',
+        tags: ['Arduino Uno','HC-05','L298N','Android App'],
+        desc: 'Control your robot wirelessly from a smartphone via Bluetooth.',
+        time: '4–5 hours', cost: '$18–28',
+        components: ['Arduino Uno','HC-05 Bluetooth','L298N Motor Driver','2× DC Motors','Android Phone','Robot Chassis'],
+        content: `
+<h3>Project Overview</h3>
+<p>Create a robot car you can drive remotely from your Android phone using a Bluetooth terminal app. The HC-05 module receives character commands (F/B/L/R/S) over Bluetooth serial.</p>
+<h3>Android App</h3>
+<p>Use "Arduino Bluetooth Controller" from Play Store, or any Bluetooth terminal app. Configure buttons to send: F=Forward, B=Backward, L=Left, R=Right, S=Stop.</p>
+<h3>HC-05 Wiring</h3>
+<ul>
+<li>VCC→5V, GND→GND</li>
+<li>TXD→Arduino pin 10 (via SoftwareSerial)</li>
+<li>RXD→Arduino pin 11 via voltage divider (1kΩ + 2kΩ)</li>
+</ul>
+<h3>Arduino Code</h3>
+<pre>#include &lt;SoftwareSerial.h&gt;
+SoftwareSerial BT(10, 11); // RX, TX
+
+void setup() {
+  BT.begin(9600);
+  // init motor pins...
+}
+
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
+    if      (c=='F') forward(200);
+    else if (c=='B') backward(150);
+    else if (c=='L') turnLeft(180);
+    else if (c=='R') turnRight(180);
+    else if (c=='S') stopAll();
+    
+    // Speed control '0'–'9'
+    else if (c>='0' && c<='9') {
+      int spd = map(c-'0', 0, 9, 0, 255);
+      analogWrite(ENA, spd);
+      analogWrite(ENB, spd);
+    }
+  }
+}</pre>
+<h3>Pairing HC-05</h3>
+<ul>
+<li>Default PIN: 1234 or 0000</li>
+<li>Pair in Android Bluetooth settings first, then open app</li>
+<li>LED blinks fast when unconnected, slow when paired</li>
+</ul>`
+      },
+      {
+        id: 'iot-monitor',
+        icon: '🌡️', bg: 'linear-gradient(135deg,rgba(255,107,0,0.08),rgba(255,200,0,0.04))',
+        title: 'IoT Weather Station', difficulty: 'medium',
+        tags: ['ESP32','DHT22','OLED','ThingSpeak'],
+        desc: 'Monitor temperature and humidity on OLED and upload to cloud via WiFi.',
+        time: '4–5 hours', cost: '$15–25',
+        components: ['ESP32','DHT22 Sensor','0.96" OLED Display','Breadboard','Power Supply'],
+        content: `
+<h3>Project Overview</h3>
+<p>Build an IoT weather monitor that reads temperature/humidity from a DHT22 sensor, displays live data on an OLED screen, and uploads readings to ThingSpeak cloud every 15 seconds for remote monitoring.</p>
+<h3>Wiring</h3>
+<ul>
+<li>DHT22: VCC→3.3V, GND→GND, DATA→GPIO4</li>
+<li>OLED (I2C): VCC→3.3V, GND→GND, SDA→GPIO21, SCL→GPIO22</li>
+</ul>
+<h3>Required Libraries</h3>
+<ul>
+<li>DHT sensor library (Adafruit)</li>
+<li>Adafruit_SSD1306 + Adafruit_GFX</li>
+<li>WiFi.h (built-in ESP32)</li>
+<li>HTTPClient.h (built-in ESP32)</li>
+</ul>
+<h3>Code Structure</h3>
+<pre>#include &lt;WiFi.h&gt;
+#include &lt;HTTPClient.h&gt;
+#include &lt;DHT.h&gt;
+#include &lt;Adafruit_SSD1306.h&gt;
+
+// ... setup WiFi, DHT, OLED
+
+void loop() {
+  float temp = dht.readTemperature();
+  float hum  = dht.readHumidity();
+  
+  // Update OLED
+  display.clearDisplay();
+  display.printf("Temp: %.1f C\n", temp);
+  display.printf("Hum:  %.1f %%\n", hum);
+  display.display();
+  
+  // Upload to ThingSpeak every 15s
+  if (millis() - lastUpload > 15000) {
+    String url = "https://api.thingspeak.com/update?api_key=";
+    url += API_KEY;
+    url += "&field1=" + String(temp);
+    url += "&field2=" + String(hum);
+    HTTPClient http;
+    http.begin(url); http.GET(); http.end();
+    lastUpload = millis();
+  }
+  delay(2000);
+}</pre>`
+      },
+      {
+        id: 'robotic-arm',
+        icon: '🦾', bg: 'linear-gradient(135deg,rgba(124,58,237,0.1),rgba(200,0,255,0.05))',
+        title: '4-DOF Robotic Arm', difficulty: 'hard',
+        tags: ['Arduino Mega','4× Servos','Potentiometers','3D Printing'],
+        desc: 'Build a 4-axis robotic arm controlled by potentiometers.',
+        time: '8–12 hours', cost: '$30–60',
+        components: ['Arduino Mega','4× MG996R Servo','4× 10kΩ Potentiometer','5V/3A Power Supply','Arm Chassis (3D printed or kit)'],
+        content: `
+<h3>Project Overview</h3>
+<p>Construct a 4-degree-of-freedom robotic arm with base rotation, shoulder, elbow, and gripper joints. Each joint is controlled by a potentiometer for intuitive manual control.</p>
+<h3>Joint Mapping</h3>
+<ul>
+<li>Servo 1 (pin 2) — Base rotation (0°–180°)</li>
+<li>Servo 2 (pin 3) — Shoulder (30°–150°)</li>
+<li>Servo 3 (pin 4) — Elbow (0°–180°)</li>
+<li>Servo 4 (pin 5) — Gripper (0°–60°)</li>
+</ul>
+<h3>Control Code</h3>
+<pre>#include &lt;Servo.h&gt;
+
+Servo base, shoulder, elbow, gripper;
+const int pots[] = {A0, A1, A2, A3};
+
+void setup() {
+  base.attach(2);     shoulder.attach(3);
+  elbow.attach(4);    gripper.attach(5);
+}
+
+void loop() {
+  // Map pot (0-1023) to servo range
+  base.write(map(analogRead(A0), 0,1023, 0,180));
+  shoulder.write(map(analogRead(A1), 0,1023, 30,150));
+  elbow.write(map(analogRead(A2), 0,1023, 0,180));
+  gripper.write(map(analogRead(A3), 0,1023, 0,60));
+  delay(15);  // Servo update rate
+}</pre>
+<h3>Power Warning</h3>
+<p>Never power 4 MG996R servos from Arduino 5V pin. Use a dedicated 5V/3A power supply. Connect grounds together.</p>
+<h3>Extensions</h3>
+<ul>
+<li>Add record/playback to save and replay movements</li>
+<li>Implement inverse kinematics for XYZ coordinate control</li>
+<li>Add Bluetooth control from a joystick app</li>
+</ul>`
+      },
+      {
+        id: 'balancing-robot',
+        icon: '⚖️', bg: 'linear-gradient(135deg,rgba(0,245,255,0.07),rgba(57,255,20,0.04))',
+        title: 'Self-Balancing Robot', difficulty: 'hard',
+        tags: ['Arduino Uno','MPU-6050','PID','Stepper Motors'],
+        desc: 'Two-wheeled robot that balances itself using PID and IMU sensor.',
+        time: '10–15 hours', cost: '$40–70',
+        components: ['Arduino Uno','MPU-6050 IMU','2× Stepper Motors','A4988 Drivers','LiPo Battery','Custom Frame'],
+        content: `
+<h3>Project Overview</h3>
+<p>The self-balancing robot is the inverted pendulum problem. An MPU-6050 IMU measures tilt angle, a PID controller computes corrections, and stepper mot
